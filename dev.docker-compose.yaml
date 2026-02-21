@@ -1,0 +1,21 @@
+name: qonsensus-dev
+
+services:
+  postgres:
+    image: postgres
+    environment:
+      POSTGRES_USER: qonsensus
+      POSTGRES_PASSWORD: qonsensus
+      POSTGRES_DB: qonsensus
+    ports:
+      - "5432:5432"
+    volumes:
+      - postgres-data:/var/lib/postgresql/data
+
+volumes:
+  postgres-data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./qonsensus-dev/postgres-data
+      o: bind
