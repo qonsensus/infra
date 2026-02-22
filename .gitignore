@@ -1,2 +1,2 @@
-quonsensus-dev/
-dev.env
+dev/data/
+*/.env
