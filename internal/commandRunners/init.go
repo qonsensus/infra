@@ -6,7 +6,6 @@ import (
 	"path/filepath"
 
 	"github.com/compose-spec/compose-go/v2/types"
-	"github.com/qonsensus/infra/internal/helpers"
 	"github.com/qonsensus/infra/internal/interfaces"
 	"github.com/qonsensus/infra/internal/models"
 	"github.com/urfave/cli/v3"
@@ -31,14 +30,6 @@ func (r *InitCommandRunner) Run(ctx context.Context, cmd *cli.Command) error {
 	}
 
 	if err := r.SaveComposeFile(compose, basePath); err != nil {
-		return err
-	}
-
-	gitHelper := &helpers.GitHelper{}
-	if err := gitHelper.CloneBackend(version, basePath); err != nil {
-		return err
-	}
-	if err := gitHelper.CloneFrontend(version, basePath); err != nil {
 		return err
 	}
 
