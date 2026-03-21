@@ -26,6 +26,8 @@ func (r *InitCommandRunner) Run(ctx context.Context, cmd *cli.Command) error {
 		Name: "quonsensus",
 		Services: types.Services{
 			"postgres": models.NewPostgresService(config).ServiceConfig,
+			"frontend": models.NewFrontendService(config).ServiceConfig,
+			"backend":  models.NewBackendService(config).ServiceConfig,
 		},
 	}
 

@@ -23,6 +23,13 @@ type ExposeConfig struct {
 
 type ContainerNames struct {
 	Postgres string `toml:"postgres"`
+	Frontend string `toml:"frontend"`
+	Backend  string `toml:"backend"`
+}
+
+type HostPortConfig struct {
+	Frontend int `toml:"frontend"`
+	Backend  int `toml:"backend"`
 }
 
 type ConfigToml struct {
@@ -30,6 +37,7 @@ type ConfigToml struct {
 	ContainerNames ContainerNames `toml:"container_names"`
 	Database       DatabaseConfig `toml:"database"`
 	ExposeDatabase ExposeConfig   `toml:"expose_database,omitempty"`
+	HostPorts      HostPortConfig `toml:"ports"`
 	basePath       string         `toml:"-"`
 }
 
@@ -46,6 +54,12 @@ func NewConfigToml(version, basePath string) *ConfigToml {
 		},
 		ContainerNames: ContainerNames{
 			Postgres: "quonsensus-postgres",
+			Frontend: "quonsensus-frontend",
+			Backend:  "quonsensus-backend",
+		},
+		HostPorts: HostPortConfig{
+			Frontend: 8080,
+			Backend:  8081,
 		},
 	}
 }
