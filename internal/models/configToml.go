@@ -6,32 +6,31 @@ import (
 	"path/filepath"
 
 	"github.com/BurntSushi/toml"
-	"github.com/qonsensus/infra/internal"
 )
 
 type ConfigToml struct {
-	ProjectName string `toml:"project_name"`
-	Version     string `toml:"version"`
-	basePath    string `toml:"-"`
+	Version  string `toml:"version"`
+	basePath string `toml:"-"`
 }
 
-// NewConfigToml creates a new ConfigToml instance. If a config.toml file exists at the given basePath, it will be decoded and returned. Otherwise, a new ConfigToml with default values will be returned.
-func NewConfigToml(basePath string) *ConfigToml {
+func NewConfigToml(version, basePath string) *ConfigToml {
+	return &ConfigToml{
+		Version:  version,
+		basePath: basePath,
+	}
+}
+
+// LoadConfigTomlFromFile loads the config.toml file from the specified basePath and decodes it into a ConfigToml struct. It returns an error if the file cannot be read or decoded.
+func LoadConfigTomlFromFile(basePath string) (*ConfigToml, error) {
 	var config ConfigToml
 	fullPath := filepath.Join(basePath, "config.toml")
-	// return new config with default values if file does not exist
-	if _, err := os.Stat(fullPath); os.IsNotExist(err) {
-		config.basePath = basePath
-		config.Version = internal.CurrentVersion
-		return &config
-	}
 	// decode existing config file
 	_, err := toml.DecodeFile(fullPath, &config)
 	if err != nil {
-		return nil
+		return nil, err
 	}
 	config.basePath = basePath
-	return &config
+	return &config, nil
 }
 
 // ToTomlString encodes the ConfigToml struct into a TOML string. If encoding fails, it returns an empty string.
@@ -47,6 +46,10 @@ func (c *ConfigToml) ToTomlString() string {
 
 // SaveToFile saves the ConfigToml struct to a config.toml file in the basePath directory. It returns an error if writing to the file fails.
 func (c *ConfigToml) SaveToFile() error {
+	// Ensure the basePath directory exists and the current user has read and write permissions
+	if err := os.MkdirAll(c.basePath, 0755); err != nil {
+		return err
+	}
 	buf := bytes.NewBufferString(c.ToTomlString())
 	return os.WriteFile(filepath.Join(c.basePath, "config.toml"), buf.Bytes(), 0644)
 }
