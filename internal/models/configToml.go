@@ -8,9 +8,16 @@ import (
 	"github.com/BurntSushi/toml"
 )
 
+type DatabaseConfig struct {
+	Username        string `toml:"username"`
+	Password        string `toml:"password"`
+	DefaultDatabase string `toml:"default_database"`
+}
+
 type ConfigToml struct {
-	Version  string `toml:"version"`
-	basePath string `toml:"-"`
+	Version  string         `toml:"version"`
+	Database DatabaseConfig `toml:"database"`
+	basePath string         `toml:"-"`
 }
 
 func NewConfigToml(version, basePath string) *ConfigToml {
