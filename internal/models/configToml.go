@@ -12,18 +12,41 @@ type DatabaseConfig struct {
 	Username        string `toml:"username"`
 	Password        string `toml:"password"`
 	DefaultDatabase string `toml:"default_database"`
+	RestartStrategy string `toml:"restart"`
+	PersistData     bool   `toml:"persist_data"`
+}
+
+type ExposeConfig struct {
+	Expose bool `toml:"expose"`
+	Port   int  `toml:"port"`
+}
+
+type ContainerNames struct {
+	Postgres string `toml:"postgres"`
 }
 
 type ConfigToml struct {
-	Version  string         `toml:"version"`
-	Database DatabaseConfig `toml:"database"`
-	basePath string         `toml:"-"`
+	Version        string         `toml:"version"`
+	ContainerNames ContainerNames `toml:"container_names"`
+	Database       DatabaseConfig `toml:"database"`
+	ExposeDatabase ExposeConfig   `toml:"expose_database,omitempty"`
+	basePath       string         `toml:"-"`
 }
 
 func NewConfigToml(version, basePath string) *ConfigToml {
 	return &ConfigToml{
 		Version:  version,
 		basePath: basePath,
+		Database: DatabaseConfig{
+			Username:        "admin",
+			Password:        "secret",
+			DefaultDatabase: "quonsensus",
+			PersistData:     true,
+			RestartStrategy: "always",
+		},
+		ContainerNames: ContainerNames{
+			Postgres: "quonsensus-postgres",
+		},
 	}
 }
 
