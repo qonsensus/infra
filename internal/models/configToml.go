@@ -2,6 +2,7 @@ package models
 
 import (
 	"bytes"
+	"fmt"
 	"os"
 	"path/filepath"
 
@@ -27,24 +28,41 @@ type ContainerNames struct {
 	Backend  string `toml:"backend"`
 }
 
-type HostPortConfig struct {
-	Frontend int `toml:"frontend"`
-	Backend  int `toml:"backend"`
-}
-
 type ConfigToml struct {
-	Version        string         `toml:"version"`
-	ContainerNames ContainerNames `toml:"container_names"`
-	Database       DatabaseConfig `toml:"database"`
-	ExposeDatabase ExposeConfig   `toml:"expose_database,omitempty"`
-	HostPorts      HostPortConfig `toml:"ports"`
-	basePath       string         `toml:"-"`
+	Version           string         `toml:"version"`
+	BackendPublicURL  string         `toml:"backend_public_url"`
+	FrontendPublicURL string         `toml:"frontend_public_url"`
+	ExposeDatabase    ExposeConfig   `toml:"expose_database"`
+	ExposeBackend     ExposeConfig   `toml:"expose_backend"`
+	ExposeFrontend    ExposeConfig   `toml:"expose_frontend"`
+	CORSOrigins       []string       `toml:"allowed_cors_origins"`
+	ContainerNames    ContainerNames `toml:"container_names"`
+	Database          DatabaseConfig `toml:"database"`
+	basePath          string         `toml:"-"`
 }
 
 func NewConfigToml(version, basePath string) *ConfigToml {
 	return &ConfigToml{
-		Version:  version,
-		basePath: basePath,
+		Version:           version,
+		basePath:          basePath,
+		BackendPublicURL:  fmt.Sprintf("http://%s:%d", "localhost", 7000),
+		FrontendPublicURL: fmt.Sprintf("http://%s:%d", "localhost", 7001),
+
+		ExposeBackend: ExposeConfig{
+			Expose: true,
+			Port:   7000,
+		},
+		ExposeFrontend: ExposeConfig{
+			Expose: true,
+			Port:   7001,
+		},
+		ExposeDatabase: ExposeConfig{
+			Expose: false,
+			Port:   5432,
+		},
+		CORSOrigins: []string{
+			"http://localhost:7001",
+		},
 		Database: DatabaseConfig{
 			Username:        "admin",
 			Password:        "secret",
@@ -56,10 +74,6 @@ func NewConfigToml(version, basePath string) *ConfigToml {
 			Postgres: "quonsensus-postgres",
 			Frontend: "quonsensus-frontend",
 			Backend:  "quonsensus-backend",
-		},
-		HostPorts: HostPortConfig{
-			Frontend: 8080,
-			Backend:  8081,
 		},
 	}
 }

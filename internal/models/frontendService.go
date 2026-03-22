@@ -11,21 +11,21 @@ type FrontendService struct {
 }
 
 func NewFrontendService(config *ConfigToml) *FrontendService {
-	backendUrl := fmt.Sprintf("http://localhost:%d", config.HostPorts.Backend)
-	return &FrontendService{
+	service := &FrontendService{
 		ServiceConfig: types.ServiceConfig{
 			Image:         fmt.Sprintf("ghcr.io/qonsensus/frontend:%s", config.Version),
 			ContainerName: config.ContainerNames.Frontend,
-			Ports: []types.ServicePortConfig{
-				{
-					Target:    80,
-					Published: fmt.Sprint(config.HostPorts.Frontend),
-				},
-			},
 			Environment: types.MappingWithEquals{
-				"API_URL": &backendUrl,
+				"API_URL": &config.BackendPublicURL,
 			},
 			Restart: "always",
 		},
 	}
+	if config.ExposeFrontend.Expose {
+		service.Ports = append(service.Ports, types.ServicePortConfig{
+			Target:    80,
+			Published: fmt.Sprint(config.ExposeFrontend.Port),
+		})
+	}
+	return service
 }

@@ -15,6 +15,7 @@ func main() {
 		Usage: "A sample CLI using urfave/cli/v3",
 		Commands: []*cli.Command{
 			(&commands.InitCommand{}).GetCommand(),
+			(&commands.UpdateCommand{}).GetCommand(),
 		},
 	}
 
