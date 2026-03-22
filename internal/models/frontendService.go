@@ -23,7 +23,7 @@ func NewFrontendService(config *ConfigToml) *FrontendService {
 				},
 			},
 			Environment: types.MappingWithEquals{
-				"VITE_API_URL": &backendUrl,
+				"API_URL": &backendUrl,
 			},
 			Restart: "always",
 		},
