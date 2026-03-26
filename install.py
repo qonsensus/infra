@@ -2,11 +2,11 @@
 # This script shall be selfcontained for easy curl | python installation
 # You may only use pythons standard librarys
 
-import os
+import string
 import sys
 from dataclasses import dataclass
+from random import choice
 from subprocess import run
-from time import sleep
 
 
 # Snaity Checks
@@ -39,15 +39,20 @@ class Colors:
     UNDERLINE = "\033[4m"
 
 
+def rm_line():  # TODO: Fix added newlines and properly work into user_input functions
+    print("\033[F\033[K", end="")
+
+
 def user_input_str(question: str, default: str = "") -> str:
     if default == "":
-        return input(f"{question}:")
+        message = input(f"{question}:")
     else:
         message = input(f"{question}  [{default}]:")
 
     if not message and default != "":
         return default
     elif not message and default == "":
+        rm_line()
         return user_input_str(question, default)
 
     return message
@@ -55,9 +60,12 @@ def user_input_str(question: str, default: str = "") -> str:
 
 def user_input_int(question: str, default: int = 0) -> int:
     if default == 0:
-        return int(input(f"{question}:"))
+        message = int(input(f"{question}:"))
     else:
         message = input(f"{question}  [{default}]:")
+
+    if not message:
+        return default
 
     try:
         message = int(message)
@@ -80,11 +88,18 @@ def user_input_bool(question: str) -> bool:
     elif message in no_choices:
         return False
     else:
+        rm_line()
         return user_input_bool("Please answer with y (yes) or n (no): ")
 
 
-def rmLine():
-    print("\033[F\033[K", end="")
+def generatePassword(length=20) -> str:
+    alphabet = string.ascii_letters + string.digits
+    return "".join(choice(alphabet) for i in range(length))
+
+
+# TODO: do this at all lmao
+def create_docker_compose(db: Database, be: Backend, fe: Frontend):
+    pass
 
 
 # Configuration Data Structures
@@ -93,7 +108,7 @@ class Database:
     DB_HOST: str = "localhost"
     DB_PORT: int = 5432
     DB_USER: str = "admin"
-    DB_PASSWORD: str = "better be secure!"
+    DB_PASSWORD: str = "secure"
     DB_NAME: str = "quonsensus"
     DB_EXPOSE: bool = False
 
@@ -120,3 +135,42 @@ if __name__ == "__main__":
     if not env.docker_version:
         print("Docker is required to install the qonsensus")
         sys.exit(1)
+
+    print("\nThis script will guide you through the installation of Quonsensus.")
+    print(f"{Colors.HEADER}We will start by setting up the database.{Colors.ENDC}")
+
+    db = Database()
+    db.DB_HOST = user_input_str("Enter the database host", db.DB_HOST)
+    rm_line()
+    db.DB_PORT = user_input_int("Enter the database port", db.DB_PORT)
+    rm_line()
+    db.DB_USER = user_input_str("Enter the database username", db.DB_USER)
+    rm_line()
+    db.DB_PASSWORD = user_input_str("Enter the database password", generatePassword())
+    rm_line()
+    db.DB_NAME = user_input_str("Enter the database name", db.DB_NAME)
+    rm_line()
+    db.DB_EXPOSE = user_input_bool("Expose the database to the host? ")
+    rm_line()
+    rm_line()
+    print(f"{Colors.HEADER}Now configuring the backend...{Colors.ENDC}")
+    be = Backend()
+    be.BE_EXPOSE = user_input_bool("Expose the backend to the host? ")
+    rm_line()
+    be.BE_PORT = user_input_int("Enter the backend port", be.BE_PORT)
+    rm_line()
+    rm_line()
+    print(f"{Colors.HEADER}Now configuring the frontend...{Colors.ENDC}")
+    fe = Frontend()
+    fe.FE_EXPOSE = user_input_bool("Expose the frontend to the host? ")
+    rm_line()
+    fe.FE_PORT = user_input_int("Enter the frontend port", fe.FE_PORT)
+    rm_line()
+
+    if fe.FE_PORT == be.BE_PORT:  # TODO: Test more potential errors
+        print("The frontend and backend are running on the same port!")
+    else:
+        print(
+            f"{Colors.OKGREEN}Configuration complete. Creating Docker containers...{Colors.ENDC}"
+        )
+        create_docker_compose(db, be, fe)
