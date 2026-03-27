@@ -1,3 +1,5 @@
+#!/usr/bin/env python3
+
 # Quonsensus Infrastructure Installation helper (docker version)
 # This script shall be selfcontained for easy curl | python installation
 # You may only use pythons standard librarys
