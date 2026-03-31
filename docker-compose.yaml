@@ -6,7 +6,8 @@ services:
     image: postgres
     profiles:
       - dev
-      - prod
+      - backend_only
+      - full
     restart: unless-stopped
     environment:
       POSTGRES_USER: ${POSTGRES_USER:?}
@@ -26,7 +27,8 @@ services:
     container_name: qonsensus-backend
     image: ghcr.io/qonsensus/backend:latest
     profiles:
-      - prod
+      - backend_only
+      - full
     restart: unless-stopped
     depends_on:
       postgres:
@@ -55,7 +57,7 @@ services:
     container_name: qonsensus-frontend
     image: ghcr.io/qonsensus/frontend:latest
     profiles:
-      - webapp
+      - full
     depends_on:
       backend:
         condition: service_healthy
@@ -67,7 +69,8 @@ services:
     container_name: qonsensus-coturn
     image: coturn/coturn:latest
     profiles:
-      - prod
+      - backend_only
+      - full
     network_mode: host
     volumes:
       - ./volumes/coturn-data:/var/lib/coturn
