@@ -45,7 +45,7 @@ services:
       TURN_SECRET: ${TURN_SECRET:?}
       CORS_ALLOWED_ORIGINS: "${FRONTEND_ANNOUNCED_SCHEMA:?}://${FRONTEND_ANNOUNCED_HOST:?}"
     ports:
-      - ${MEDIASOUP_UDP_MIN:?}-${MEDIASOUP_UDP_MAX:?}/udp
+      - ${MEDIASOUP_UDP_MIN:?}-${MEDIASOUP_UDP_MAX:?}:${MEDIASOUP_UDP_MIN:?}-${MEDIASOUP_UDP_MAX:?}/udp
       - ${BACKEND_PORT:?}:3000/tcp
       - ${BACKEND_PORT:?}:3000/udp
   frontend:
