@@ -47,7 +47,7 @@ services:
       MEDIASOUP_MIN: ${MEDIASOUP_MIN}
       MEDIASOUP_MAX: ${MEDIASOUP_MAX}
     ports:
-      - ${MEDIASOUP_UDP_MIN:?}-${MEDIASOUP_UDP_MAX:?}:${MEDIASOUP_UDP_MIN:?}-${MEDIASOUP_UDP_MAX:?}/udp
+      - ${MEDIASOUP_MIN:?}-${MEDIASOUP_MAX:?}:${MEDIASOUP_MIN:?}-${MEDIASOUP_MAX:?}/udp
       - ${BACKEND_PORT:?}:3000/tcp
       - ${BACKEND_PORT:?}:3000/udp
   frontend:
